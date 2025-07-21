@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Science Reviewer - Aurora UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #E5E7EB;
+            overflow: hidden; /* Hide scrollbar on body */
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a0a;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.7s ease-out, visibility 0.7s;
+            visibility: visible;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Improved Aurora Background --- */
+        #aurora-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            background: 
+                radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 52% 99%, hsla(355, 98%, 76%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 10% 29%, hsla(256, 96%, 68%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 97% 96%, hsla(38, 60%, 74%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 33% 50%, hsla(222, 67%, 73%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 79% 53%, hsla(343, 68%, 79%, 0.4) 0px, transparent 50%);
+            animation: moveAurora 30s linear infinite;
+        }
+
+        @keyframes moveAurora {
+            0% {
+                background-position: 0% 50%, 10% 80%, 30% 20%, 50% 90%, 70% 10%, 90% 70%, 100% 30%;
+                transform: rotate(0deg) scale(1.2);
+            }
+            50% {
+                background-position: 100% 50%, 90% 20%, 70% 80%, 50% 10%, 30% 90%, 10% 30%, 0% 70%;
+                transform: rotate(180deg) scale(1.2);
+            }
+            100% {
+                background-position: 0% 50%, 10% 80%, 30% 20%, 50% 90%, 70% 10%, 90% 70%, 100% 30%;
+                transform: rotate(360deg) scale(1.2);
+            }
+        }
+
+
+        /* --- Main Content Container --- */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .main-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- Enhanced Glassmorphism Panels --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.1s linear;
+        }
+
+        /* --- Section Styling --- */
+        .section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            scroll-snap-align: start;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Card styling with hover glow */
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s ease, transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Formula Triangle */
+        .formula-triangle {
+            width: 250px;
+            height: 220px;
+            position: relative;
+        }
+        .triangle-shape {
+            width: 0;
+            height: 0;
+            border-left: 125px solid transparent;
+            border-right: 125px solid transparent;
+            border-bottom: 220px solid rgba(255, 255, 255, 0.1);
+        }
+        .triangle-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .triangle-top {
+            padding-top: 30px;
+        }
+        .triangle-bottom {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: 15px;
+        }
+        .triangle-divider {
+            position: absolute;
+            top: 66.66%;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Animated Background -->
+    <div id="aurora-background"></div>
+
+    <!-- Main Scrollable Content -->
+    <main class="main-content">
+        
+        <!-- Header Section -->
+        <section class="section" id="home">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tight">General Science Reviewer</h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-300">A Summary of Core Concepts</p>
+                <p class="mt-8 text-cyan-400 animate-pulse">Scroll down to explore</p>
+            </div>
+        </section>
+
+        <!-- Section: Foundational Concepts -->
+        <section class="section" id="foundations">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">Foundational Concepts</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Translational Movement</h3>
+                        <p class="text-gray-300">Motion where an object shifts from one point to another without changing its orientation. <br><strong>Example:</strong> A car on a straight road.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Rotational Movement</h3>
+                        <p class="text-gray-300">Motion where an object spins around a fixed axis, changing its orientation. <br><strong>Example:</strong> A spinning planet.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Linear Displacement (s)</h3>
+                        <p class="text-gray-300">The shortest path and direction between two points. A vector measured in <strong>meters (m)</strong>.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Angular Displacement (θ)</h3>
+                        <p class="text-gray-300">The angle an object rotates around an axis. A vector measured in <strong>radians (rad)</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Dynamics -->
+        <section class="section" id="dynamics">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">Dynamics: Forces in Motion</h2>
+                <div class="space-y-6">
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Vector & Acceleration</h3>
+                        <p class="text-gray-300 mb-2">A <strong>vector</strong> has magnitude and direction. <strong>Acceleration (a)</strong> is the rate of change of velocity.</p>
+                        <code class="block bg-black/50 p-3 rounded-lg text-yellow-300 text-lg mt-2">a = Δv / Δt</code>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="card p-4 rounded-lg">
+                            <h3 class="text-2xl font-semibold mb-2">Mass (m)</h3>
+                            <p class="text-gray-300">A measure of matter and inertia, measured in <strong>kilograms (kg)</strong>.</p>
+                        </div>
+                        <div class="card p-4 rounded-lg">
+                            <h3 class="text-2xl font-semibold mb-2">Force (F)</h3>
+                            <p class="text-gray-300">A push or pull that causes acceleration.</p>
+                            <code class="block bg-black/50 p-3 rounded-lg text-yellow-300 text-lg mt-2">F = ma</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Kinematics Equations -->
+        <section class="section" id="kinematics">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">Kinematics: Equations of Motion</h2>
+                <p class="text-lg text-gray-300 mb-6 text-center">These equations describe the motion of objects with constant acceleration.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2">Velocity-Time</h3>
+                        <code class="block text-yellow-300 text-lg">v = v₀ + at</code>
+                        <p class="text-sm text-gray-400 mt-2">Final velocity (v) from initial velocity (v₀), acceleration (a), and time (t).</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2">Displacement-Time</h3>
+                        <code class="block text-yellow-300 text-lg">s = v₀t + ½at²</code>
+                        <p class="text-sm text-gray-400 mt-2">Displacement (s) from initial velocity, time, and acceleration.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2">Velocity-Displacement</h3>
+                        <code class="block text-yellow-300 text-lg">v² = v₀² + 2as</code>
+                        <p class="text-sm text-gray-400 mt-2">Final velocity from initial velocity, acceleration, and displacement.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2">Average Velocity</h3>
+                        <code class="block text-yellow-300 text-lg">s = ½(v + v₀)t</code>
+                        <p class="text-sm text-gray-400 mt-2">Displacement from the average of initial and final velocities over time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section: Pressure (UPDATED) -->
+        <section class="section" id="pressure">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">Pressure, Force & Area</h2>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <!-- Formula Triangle -->
+                    <div class="flex justify-center items-center">
+                        <div class="formula-triangle">
+                            <div class="triangle-shape"></div>
+                            <div class="triangle-content">
+                                <div class="triangle-top text-cyan-300">F</div>
+                                <div class="triangle-divider"></div>
+                                <div class="triangle-bottom">
+                                    <span class="text-yellow-300">P</span>
+                                    <span class="text-green-300">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Formula Cards -->
+                    <div class="space-y-4">
+                        <div class="card p-4 rounded-lg">
+                            <h4 class="text-xl font-semibold text-yellow-300">Pressure (P)</h4>
+                            <code class="block text-2xl my-1">P = F / A</code>
+                            <p class="text-sm text-gray-400">Unit: Pascals (Pa)</p>
+                        </div>
+                        <div class="card p-4 rounded-lg">
+                            <h4 class="text-xl font-semibold text-cyan-300">Force (F)</h4>
+                            <code class="block text-2xl my-1">F = P × A</code>
+                            <p class="text-sm text-gray-400">Unit: Newtons (N)</p>
+                        </div>
+                        <div class="card p-4 rounded-lg">
+                            <h4 class="text-xl font-semibold text-green-300">Area (A)</h4>
+                            <code class="block text-2xl my-1">A = F / P</code>
+                            <p class="text-sm text-gray-400">Unit: Meters Squared (m²)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Machines -->
+        <section class="section" id="machines">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">Mechanical Advantage</h2>
+                 <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Simple Machines</h3>
+                        <p class="text-gray-300">Devices that change a force's direction or magnitude. <br><strong>Examples:</strong> Lever, pulley, inclined plane, wedge, screw, wheel & axle.</p>
+                    </div>
+                    <div class="card p-4 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Compound Machines</h3>
+                        <p class="text-gray-300">A combination of two or more simple machines working together. <br><strong>Example:</strong> A pair of scissors combines two levers.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Safety Procedures & Guidelines -->
+        <section class="section" id="spg">
+            <div class="glass-panel w-full max-w-5xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-cyan-300 mb-6 border-b border-cyan-300/20 pb-3">27 Safety Procedures & Guidelines (SPG)</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-gray-300">
+                    <ol class="list-decimal list-inside space-y-2 text-sm">
+                        <li>Always wear safety goggles.</li>
+                        <li>Know safety equipment locations.</li>
+                        <li>No eating or drinking in the lab.</li>
+                        <li>Tie back long hair securely.</li>
+                        <li>Avoid loose clothing or jewelry.</li>
+                        <li>Handle all chemicals with care.</li>
+                        <li>Never taste or directly smell chemicals.</li>
+                        <li>Read all chemical labels carefully.</li>
+                        <li>Report all accidents immediately.</li>
+                    </ol>
+                    <ol class="list-decimal list-inside space-y-2 text-sm" start="10">
+                        <li>Dispose of chemical waste properly.</li>
+                        <li>Keep your workspace clean & tidy.</li>
+                        <li>Handle glassware with caution.</li>
+                        <li>Use a fume hood for volatile fumes.</li>
+                        <li>Never work alone in the laboratory.</li>
+                        <li>Wash hands before leaving the lab.</li>
+                        <li>Follow all instructions precisely.</li>
+                        <li>Never point test tubes at anyone.</li>
+                        <li>Handle hot equipment with tongs.</li>
+                    </ol>
+                    <ol class="list-decimal list-inside space-y-2 text-sm" start="19">
+                        <li>Check glassware for cracks or chips.</li>
+                        <li>Add acid to water, never the reverse.</li>
+                        <li>Use equipment only as intended.</li>
+                        <li>Secure gas cylinders when in use.</li>
+                        <li>Know all emergency procedures.</li>
+                        <li>Wear appropriate protective gloves.</li>
+                        <li>Use a pipette filler, never by mouth.</li>
+                        <li>Clearly label all containers.</li>
+                        <li>Treat all chemicals as hazardous.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="section" id="footer">
+            <div class="text-center text-gray-400 text-sm">
+                <p>General Science Reviewer | Ligao City, Bicol, Philippines</p>
+                <p>&copy; 2025. All concepts for educational purposes.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- FIX: Preloader logic corrected ---
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.visibility = 'hidden';
+                preloader.style.display = 'none';
+            }, 700);
+        }
+
+        // --- 3D Tilt Effect for Glass Panels ---
+        const panels = document.querySelectorAll('.glass-panel');
+        panels.forEach(panel => {
+            panel.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = panel.getBoundingClientRect();
+                const x = e.clientX - left;
+                const y = e.clientY - top;
+
+                const rotateX = (y / height - 0.5) * -15;
+                const rotateY = (x / width - 0.5) * 15;
+
+                panel.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            panel.addEventListener('mouseleave', () => {
+                panel.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
+        // --- Scroll-based Animations ---
+        const sections = document.querySelectorAll('.section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.2
+        });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    });
+    </script>
+</body>
+</html>
